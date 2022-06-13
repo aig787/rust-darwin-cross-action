@@ -6,7 +6,7 @@ RUN cd /tmp && \
     make && \
     make install
 
-FROM ubuntu:focal-20220302
+FROM ubuntu:focal-20220531
 ARG TOOLCHAIN
 
 COPY --from=builder /opt/osxcross /opt/osxcross
