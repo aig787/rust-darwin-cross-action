@@ -14,7 +14,7 @@ inputs:
     required: false
 runs:
   using: "docker"
-  image: "docker://ghcr.io/aig787/rust-darwin-cross-action:1.84.1"
+  image: "docker://ghcr.io/aig787/rust-darwin-cross-action:1.85.0"
   args:
     - ${{ inputs.args }}
     - ${{ inputs.directory}}
