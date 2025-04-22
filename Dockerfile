@@ -34,8 +34,8 @@ ENV CARGO_HOME=/opt/rust/cargo
 ENV PATH=$PATH:/opt/osxcross/bin:/usr/local/bomutils/bin:${CARGO_HOME}:${RUSTUP_HOME}
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain $RUST_VERSION -t x86_64-apple-darwin
-ADD cargo-config.toml $CARGO_HOME/config
-RUN sed -i "s/VERSION/$DARWIN_VERSION/g" ${CARGO_HOME}/config
+ADD cargo-config.toml $CARGO_HOME/config.toml
+RUN sed -i "s/VERSION/$DARWIN_VERSION/g" ${CARGO_HOME}/config.toml
 RUN chmod -R 777 $CARGO_HOME
 
 RUN mkdir -p /github
