@@ -17,7 +17,7 @@ inputs:
     required: false
 runs:
   using: "docker"
-  image: "docker://ghcr.io/aig787/rust-darwin-cross-action:1.91.0"
+  image: "docker://ghcr.io/aig787/rust-darwin-cross-action:pass-through-env"
   args:
     - ${{ inputs.args }}
     - ${{ inputs.directory}}
