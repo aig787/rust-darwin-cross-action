@@ -29,13 +29,13 @@ ln -sf $CARGO_HOME/bin .cargo/
 
 if [ -f .cargo/config.toml ]; then
     mv .cargo/config.toml .cargo/config.toml.original
-    cp $CARGO_HOME/config.toml .cargo/config.toml
+    cp $CARGO_HOME/config .cargo/config.toml
     cat .cargo/config.toml.original >> .cargo/config.toml
 elif [ -f .cargo/config ]; then
-    cp $CARGO_HOME/config.toml .cargo/config.toml
+    cp $CARGO_HOME/config .cargo/config.toml
     cat .cargo/config >> .cargo/config.toml
 else
-    cp $CARGO_HOME/config.toml .cargo/config.toml
+    cp $CARGO_HOME/config .cargo/config.toml
 fi
 
 
