@@ -5,7 +5,10 @@ on:
     inputs:
       toolchain:
         description: "Rust toolchain version"
-        required: true
+        required: false
+      tag:
+        description: "Tag for PR-based releases (skips release creation)"
+        required: false
   schedule:
     - cron: "0 0 * * 0/2"
 
@@ -36,7 +39,17 @@ jobs:
       - name: Set version
         if: github.event_name == 'workflow_dispatch'
         run: |
-          echo "TOOLCHAIN=${{ github.event.inputs.toolchain }}" >> $GITHUB_ENV
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            echo "VERSION=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+            echo "IS_TAG_RELEASE=true" >> $GITHUB_ENV
+            # For tag-based releases, get the current stable toolchain
+            TOOLCHAIN=$(rustc --version | cut -d' ' -f2 )
+            echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
+          else
+            echo "VERSION=${{ github.event.inputs.toolchain }}" >> $GITHUB_ENV
+            echo "TOOLCHAIN=${{ github.event.inputs.toolchain }}" >> $GITHUB_ENV
+            echo "IS_TAG_RELEASE=false" >> $GITHUB_ENV
+          fi
           echo EXECUTE=true >> $GITHUB_ENV
       - name: Log in to GitHub Docker Registry
         if: env.EXECUTE == 'true'
@@ -55,36 +68,44 @@ jobs:
             TOOLCHAIN=${{ env.TOOLCHAIN }}
           tags: |
             ghcr.io/aig787/rust-darwin-cross-action:${{ github.sha }}
-            ghcr.io/aig787/rust-darwin-cross-action:${{ env.TOOLCHAIN }}
+            ghcr.io/aig787/rust-darwin-cross-action:${{ env.VERSION }}
       - name: Update version in actions.yml
         if: env.EXECUTE == 'true'
         uses: jacobtomlinson/gha-find-replace@v2
         with:
           find: 'docker://ghcr.io/aig787/rust-darwin-cross-action:[^"]+'
-          replace: "docker://ghcr.io/aig787/rust-darwin-cross-action:${{ env.TOOLCHAIN }}"
+          replace: "docker://ghcr.io/aig787/rust-darwin-cross-action:${{ env.VERSION }}"
           include: "action.yml"
       - name: Update version in README
         if: env.EXECUTE == 'true'
         uses: jacobtomlinson/gha-find-replace@v2
         with:
           find: "aig787/rust-darwin-cross-action@.+"
-          replace: "aig787/rust-darwin-cross-action@${{ env.TOOLCHAIN }}"
+          replace: "aig787/rust-darwin-cross-action@${{ env.VERSION }}"
           include: "README.md"
-      - name: Commit and push
-        if: env.EXECUTE == 'true'
+      - name: Commit and push (tag-based release)
+        if: env.EXECUTE == 'true' && env.IS_TAG_RELEASE == 'true'
         uses: EndBug/add-and-commit@v9
         with:
-          message: "Updated actions container to ${{ env.TOOLCHAIN }}"
+          message: "Updated actions container to ${{ env.VERSION }}"
           committer_name: GitHub Actions
           committer_email: actions@github.com
           add: '["action.yml", "README.md"]'
-          tag: ${{ env.TOOLCHAIN }}
+      - name: Commit and push (toolchain release)
+        if: env.EXECUTE == 'true' && env.IS_TAG_RELEASE != 'true'
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Updated actions container to ${{ env.VERSION }}"
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
+          add: '["action.yml", "README.md"]'
+          tag: ${{ env.VERSION }}
       - name: Create a GitHub release
-        if: env.EXECUTE == 'true'
+        if: env.EXECUTE == 'true' && env.IS_TAG_RELEASE != 'true'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "${{ env.TOOLCHAIN }}"
-          release_name: "Release ${{ env.TOOLCHAIN }}"
-          body: "${{ env.TOOLCHAIN }}"
+          tag_name: "${{ env.VERSION }}"
+          release_name: "Release ${{ env.VERSION }}"
+          body: "${{ env.VERSION }}"
