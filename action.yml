@@ -12,6 +12,9 @@ inputs:
   directory:
     description: Relative path under $GITHUB_WORKSPACE where Cargo project is located
     required: false
+  env:
+    description: "Environment variables to pass to the container (newline-separated KEY=VALUE pairs)"
+    required: false
 runs:
   using: "docker"
   image: "docker://ghcr.io/aig787/rust-darwin-cross-action:1.91.0"
@@ -19,6 +22,7 @@ runs:
     - ${{ inputs.args }}
     - ${{ inputs.directory}}
     - ${{ inputs.git_credentials }}
+    - ${{ inputs.env }}
   post-entrypoint: "cleanup.sh"
 branding:
   icon: box

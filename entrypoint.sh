@@ -2,6 +2,23 @@
 
 set -e
 
+# Parse and export environment variables (4th argument)
+if [ "x$4" != "x" ]; then
+    echo "Setting environment variables from input"
+    # Handle newline-separated KEY=VALUE format
+    while IFS= read -r line; do
+        # Skip empty lines
+        if [ -z "$line" ]; then
+            continue
+        fi
+        # Export the variable
+        export "$line"
+        # Extract just the key name for logging (before the = sign)
+        key="${line%%=*}"
+        echo "Exported: $key"
+    done <<< "$4"
+fi
+
 if [ "x$3" != "x" ]; then
     echo $3 > .git_credentials
     git config --global credential.helper "store --file $PWD/.git_credentials"
