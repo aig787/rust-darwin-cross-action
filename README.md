@@ -9,7 +9,7 @@ Rust Darwin Builder Action
 GitHub action for building Darwin targeted rust binaries (x86_64-apple-darwin). 
 
 ```yaml
-- uses: aig787/rust-darwin-cross-action@1.91.0
+- uses: aig787/rust-darwin-cross-action@1.91.1
   with:
     args: build --release --all-features
     git_credentials: ${{ secrets.GIT_CREDENTIALS }}
