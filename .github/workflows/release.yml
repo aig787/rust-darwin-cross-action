@@ -58,14 +58,14 @@ jobs:
             ghcr.io/aig787/rust-darwin-cross-action:${{ env.TOOLCHAIN }}
       - name: Update version in actions.yml
         if: env.EXECUTE == 'true'
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: 'docker://ghcr.io/aig787/rust-darwin-cross-action:[^"]+'
           replace: "docker://ghcr.io/aig787/rust-darwin-cross-action:${{ env.TOOLCHAIN }}"
           include: "action.yml"
       - name: Update version in README
         if: env.EXECUTE == 'true'
-        uses: jacobtomlinson/gha-find-replace@v2
+        uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "aig787/rust-darwin-cross-action@.+"
           replace: "aig787/rust-darwin-cross-action@${{ env.TOOLCHAIN }}"
